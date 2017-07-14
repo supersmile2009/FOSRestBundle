@@ -6,11 +6,20 @@
 
     <services>
         <service id="fos_rest.exception_listener" class="FOS\RestBundle\EventListener\ExceptionListener">
-            <tag name="kernel.event_subscriber" />
             <tag name="monolog.logger" channel="request" />
-            <argument>fos_rest.exception.controller:showAction</argument>
+            <argument type="service" id="security.token_storage" />
+            <argument type="service" id="security.authentication.trust_resolver" />
+            <argument type="service" id="security.http_utils" />
+            <argument />
+            <argument type="service" id="security.authentication.entry_point" on-invalid="null" />
+            <argument>%security.access.denied_url%</argument>
+            <argument type="service" id="security.access.denied_handler" on-invalid="null" />
             <argument type="service" id="logger" on-invalid="null" />
+            <argument>false</argument> <!-- Stateless -->
+            <argument>fos_rest.exception.controller:showAction</argument>
         </service>
+
+        <service id="security.exception_listener" alias="fos_rest.exception_listener" />
 
         <service id="fos_rest.exception.controller" class="FOS\RestBundle\Controller\ExceptionController">
             <argument type="service" id="fos_rest.view_handler" />
