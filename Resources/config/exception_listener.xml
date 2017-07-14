@@ -20,6 +20,9 @@
         </service>
 
         <service id="security.exception_listener" alias="fos_rest.exception_listener" />
+        <!-- for Symfony 2.8 compatibility - otherwise they are not able to reference security.exception_listener -->
+        <service id="security.exception_listener.main" alias="fos_rest.exception_listener" />
+        <service id="security.exception_listener.default" alias="fos_rest.exception_listener" />
 
         <service id="fos_rest.exception.controller" class="FOS\RestBundle\Controller\ExceptionController">
             <argument type="service" id="fos_rest.view_handler" />
