@@ -31,7 +31,6 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class ExceptionListener extends HttpFirewallExceptionListener
 {
-
     /**
      * @var HttpKernelExceptionListener
      */
@@ -63,6 +62,7 @@ class ExceptionListener extends HttpFirewallExceptionListener
 
         if (!$request->attributes->get(FOSRestBundle::ZONE_ATTRIBUTE, true)) {
             parent::onKernelException($event);
+
             return;
         }
 

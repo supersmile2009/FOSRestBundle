@@ -1,6 +1,7 @@
 imports:
     - { resource: ../config/default.yml }
     - { resource: ../config/exception_listener.yml }
+    - { resource: ../config/security.yml }
 
 framework:
     serializer:
