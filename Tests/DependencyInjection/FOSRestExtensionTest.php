@@ -14,7 +14,6 @@ namespace FOS\RestBundle\Tests\DependencyInjection;
 use FOS\RestBundle\DependencyInjection\FOSRestExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -50,6 +49,11 @@ class FOSRestExtensionTest extends \PHPUnit_Framework_TestCase
      */
     private $defaultFormat;
 
+    /**
+     * @var
+     */
+    private $childDefinition;
+
     public function setUp()
     {
         $this->container = new ContainerBuilder();
@@ -63,6 +67,8 @@ class FOSRestExtensionTest extends \PHPUnit_Framework_TestCase
             'html' => true,
         ];
         $this->defaultFormat = null;
+        $childDefinition = 'Symfony\Component\DependencyInjection\ChildDefinition';
+        $this->childDefinition = class_exists($childDefinition) ? $childDefinition : 'Symfony\Component\DependencyInjection\DefinitionDecorator';
     }
 
     public function tearDown()
@@ -328,13 +334,10 @@ class FOSRestExtensionTest extends \PHPUnit_Framework_TestCase
     public function testConfigLoad()
     {
         $controllerLoaderDefinitionName = 'fos_rest.routing.loader.controller';
-        $controllerLoaderClass = 'FOS\RestBundle\Routing\Loader\RestRouteLoader';
 
         $yamlCollectionLoaderDefinitionName = 'fos_rest.routing.loader.yaml_collection';
-        $yamlCollectionLoaderClass = 'FOS\RestBundle\Routing\Loader\RestYamlCollectionLoader';
 
         $xmlCollectionLoaderDefinitionName = 'fos_rest.routing.loader.xml_collection';
-        $xmlCollectionLoaderClass = 'FOS\RestBundle\Routing\Loader\RestXmlCollectionLoader';
 
         $this->extension->load([], $this->container);
 
@@ -634,7 +637,7 @@ class FOSRestExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->container->has('fos_rest.view_handler'));
 
         $viewHandler = $this->container->getDefinition('fos_rest.view_handler');
-        $this->assertInstanceOf(DefinitionDecorator::class, $viewHandler);
+        $this->assertInstanceOf($this->childDefinition, $viewHandler);
     }
 
     public function testSerializerExceptionNormalizer()
@@ -672,14 +675,14 @@ class FOSRestExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('addRequestMatcher', $addRequestMatcherCalls[0][0]);
         $requestMatcherFirstId = (string) $addRequestMatcherCalls[0][1][0];
         $requestMatcherFirst = $this->container->getDefinition($requestMatcherFirstId);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $requestMatcherFirst);
+        $this->assertInstanceOf($this->childDefinition, $requestMatcherFirst);
         $this->assertEquals('/api/*', $requestMatcherFirst->getArgument(0));
 
         // Second zone
         $this->assertEquals('addRequestMatcher', $addRequestMatcherCalls[1][0]);
         $requestMatcherSecondId = (string) $addRequestMatcherCalls[1][1][0];
         $requestMatcherSecond = $this->container->getDefinition($requestMatcherSecondId);
-        $this->assertInstanceOf('Symfony\Component\DependencyInjection\DefinitionDecorator', $requestMatcherSecond);
+        $this->assertInstanceOf($this->childDefinition, $requestMatcherSecond);
         $this->assertEquals('/^second', $requestMatcherSecond->getArgument(0));
         $this->assertEquals(array('127.0.0.1'), $requestMatcherSecond->getArgument(3));
     }

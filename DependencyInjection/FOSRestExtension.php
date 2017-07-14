@@ -13,7 +13,7 @@ namespace FOS\RestBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\DefinitionDecorator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Form\AbstractType;
@@ -23,6 +23,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FOSRestExtension extends Extension
 {
+    /**
+     * @var string
+     */
+    private $childDefinitionClass;
+
     /**
      * {@inheritdoc}
      */
@@ -42,6 +47,7 @@ class FOSRestExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $this->childDefinitionClass = class_exists(ChildDefinition::class) ? ChildDefinition::class : 'Symfony\Component\DependencyInjection\DefinitionDecorator';
         $configuration = new Configuration($container->getParameter('kernel.debug'));
         $config = $this->processConfiguration($configuration, $configs);
 
@@ -240,7 +246,7 @@ class FOSRestExtension extends Extension
     private function loadView(array $config, XmlFileLoader $loader, ContainerBuilder $container)
     {
         if (!empty($config['view']['jsonp_handler'])) {
-            $handler = new DefinitionDecorator($config['service']['view_handler']);
+            $handler = new $this->childDefinitionClass($config['service']['view_handler']);
             $handler->setPublic(true);
 
             $jsonpHandler = new Reference('fos_rest.view_handler.jsonp');
@@ -403,7 +409,7 @@ class FOSRestExtension extends Extension
         }
 
         $container
-            ->setDefinition($id, new DefinitionDecorator('fos_rest.zone_request_matcher'))
+            ->setDefinition($id, new $this->childDefinitionClass('fos_rest.zone_request_matcher'))
             ->setArguments($arguments)
         ;
 
