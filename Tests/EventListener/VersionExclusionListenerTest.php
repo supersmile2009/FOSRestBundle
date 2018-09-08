@@ -11,33 +11,36 @@
 
 namespace FOS\RestBundle\Tests\EventListener;
 
-use FOS\RestBundle\EventListener\VersionListener;
+use FOS\RestBundle\EventListener\VersionExclusionListener;
 use FOS\RestBundle\FOSRestBundle;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Version listener test.
+ * Version exclusion listener test.
  *
- * @author Ener-Getick <egetick@gmail.com>
+ * @author juillerat <philippe.juillerat@filago.ch>
  */
-class VersionListenerTest extends TestCase
+class VersionExclusionListenerTest extends TestCase
 {
+    /**
+     * @var \FOS\RestBundle\View\ConfigurableViewHandlerInterface
+     */
+    private $viewHandler;
     /**
      * @var \FOS\RestBundle\Version\VersionResolverInterface
      */
     private $resolver;
-
     /**
-     * @var VersionListener
+     * @var VersionExclusionListener
      */
     private $listener;
 
     public function setUp()
     {
-        $this->resolver = $this->getMockBuilder('FOS\RestBundle\Version\VersionResolverInterface')->getMock();
+        $this->viewHandler = $this->getMockBuilder('FOS\RestBundle\View\ConfigurableViewHandlerInterface')->getMock();
 
-        $this->listener = new VersionListener($this->resolver);
+        $this->listener = new VersionExclusionListener($this->viewHandler);
     }
 
     public function testMatchNoZone()
