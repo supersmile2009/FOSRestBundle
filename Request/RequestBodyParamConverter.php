@@ -122,7 +122,7 @@ class RequestBodyParamConverter implements ParamConverterInterface
      */
     public function supports(ParamConverter $configuration)
     {
-        return null !== $configuration->getClass() && 'fos_rest.request_body' === $configuration->getConverter();
+        return null !== $configuration->getClass();
     }
 
     protected function configureContext(Context $context, array $options)
